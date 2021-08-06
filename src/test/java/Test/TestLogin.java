@@ -21,32 +21,32 @@ public class TestLogin {
 
     @ParameterizedTest
     @CsvSource({
-            "13536764015, 123456",
-            "18475465437, 123456",
-            "18475465438, 123456"
+            "13536764015, 123456,200",
+            "18475465437, 123456,200",
+            "18475465438, 123456,500"
     })
-    public void testLogin(String mobile,String password){
-//       String mobile="13536764015";
-//       String password="123456";
+    public void testLogin(String mobile,String password,String expectStateCode){
        Response loginResponse = LoginTest.loginByiMobile(mobile,password);
        Integer stateCode = loginResponse.path("stateCode");
        String access_token=loginResponse.path("data.access_token");
 
-       assertTrue (stateCode.equals(200));
+       assertTrue(stateCode.equals(Integer.valueOf(expectStateCode)));
+
         System.out.println(access_token);
+        System.out.println(stateCode);
     }
 
     @ParameterizedTest
     @CsvFileSource(resources ="/loginParameter.yaml",numLinesToSkip = 1)
-    public void loginTest2(String mobile,String password){
+    public void loginTest2(String mobile,String password,String expectStateCode,String  expectAccessToken){
        Response loginResponse = LoginTest.loginByiMobile(mobile,password);
        Integer stateCode = loginResponse.path("stateCode");
        String access_token=loginResponse.path("data.access_token");
 
       // assertTrue (stateCode.equals(200));
         assertAll("stateCode",
-                () -> assertEquals("200", stateCode.toString()),
-                () -> assertNotNull(access_token)
+                () -> assertEquals(expectStateCode, stateCode.toString()),
+                () -> assertEquals(expectAccessToken,access_token)
         );
 
     }
